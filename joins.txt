@@ -1,0 +1,58 @@
+package pack
+
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
+
+object obj {
+
+
+def main(args:Array[String]):Unit={
+
+
+
+System.setProperty("hadoop.home.dir", "D:\\hadoop") 
+
+val conf = new SparkConf().setAppName("wcfinal").setMaster("local[*]").set("spark.driver.host","localhost").set("spark.driver.allowMultipleContexts", "true")
+
+val sc = new SparkContext(conf)   
+
+sc.setLogLevel("ERROR")
+
+val spark  = SparkSession.builder().config(conf).getOrCreate() 
+
+import spark.implicits._
+
+val custn= spark.read.format("csv") .option("header", "true").load("file:///D:/data//custn.csv")
+ custn.show()
+val proddt= spark.read.format("csv") .option("header", "true"). load("file:///D:/data//prodn.csv")
+proddt.show()
+
+    
+
+println("=====inner join====")
+val innerjoin= custn.join(proddt, Seq("id"), "inner") 
+innerjoin.show()
+
+println("=====left join====")
+val leftjoin= custn.join(proddt, Seq("id"), "left") 
+leftjoin.show()
+
+println("=====right join====")
+val rightjoin= custn.join(proddt, Seq("id"), "right") 
+rightjoin.show()
+
+println("=====full join====")
+val fulljoin= custn.join(proddt, Seq("id"), "full").orderBy ("id") 
+fulljoin.show()
+
+println("=====left anti join====")
+val leftantijoin= custn.join (proddt, Seq("id"), "left_anti") 
+leftantijoin.show()
+
+
+
+}
+}
